@@ -55,20 +55,16 @@ class Customer {
     return new Customer(customer);
   }
 
-  /** Given an array of strings, return an array of customer instances that
-   *  match the string contents.
-   *
-   *
-   *
-   * get a customer by name. Take in a string,
-   * if only one name, return any matching customers,
-   * for first or last name, if full name, search for entire name
+  /** Given a string of customer name, query database for matching customers.
+   *  If only one name is provided, return any matching customers for first or
+   *  last name. If full name is provided, return customer whose full name
+   *  matches.
    */
   static async getByName(name) {
     const formattedName = formatName(name);
     if (nameAsArr.length === 0) throw new Error();
 
-    const result = await db.query(`
+    const results = await db.query(`
     SELECT id,
             first_name AS 'firstName',
             last_name AS 'lastName',
@@ -80,7 +76,13 @@ class Customer {
       formattedName);
     const customers = results.rows;
 
-    // now do stuff with the array!
+    if (customers.length === 0) {
+      const err = new Error(`No such customer(s): ${name}`);
+      err.status = 404;
+      throw err;
+    }
+
+    return results.rows.map(c => new Customer(c));
   }
 
   /** get all reservations for this customer. */
