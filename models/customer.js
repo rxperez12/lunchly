@@ -2,6 +2,7 @@
 
 import db from "../db.js";
 import Reservation from "./reservation.js";
+import { formatName } from "../utils.js";
 
 /** Customer of the restaurant. */
 
@@ -54,47 +55,32 @@ class Customer {
     return new Customer(customer);
   }
 
-  /** get a customer by name. Take in a string,
+  /** Given an array of strings, return an array of customer instances that
+   *  match the string contents.
+   *
+   *
+   *
+   * get a customer by name. Take in a string,
    * if only one name, return any matching customers,
    * for first or last name, if full name, search for entire name
    */
-  static async get(name) {
-    const nameAsArr = sanitzeName(name);
-
-    const results = [];
+  static async getByName(name) {
+    const formattedName = formatName(name);
     if (nameAsArr.length === 0) throw new Error();
 
-    if (nameAsArr.length == 2) {
-      // run this query
-    } else if (nameAsArr == 1) {
-      //run this query
-    }
+    const result = await db.query(`
+    SELECT id,
+            first_name AS 'firstName',
+            last_name AS 'lastName',
+            phone,
+            notes
+    FROM customers
+    WHERE first_name IN ($1, $2) OR last_name IN ($1, 2)
+    ORDER BY first_name, last_name`,
+      formattedName);
+    const customers = results.rows;
 
-
-    return results;
-    // split name by space
-    //trim extra white space
-    //capitalize first letter of each word
-    const results = await db.query(
-      `SELECT id,
-                  first_name AS "firstName",
-                  last_name  AS "lastName",
-                  phone,
-                  notes
-           FROM customers
-           WHERE id = $1`,
-      [id],
-    );
-
-    const customer = results.rows[0];
-
-    if (customer === undefined) {
-      const err = new Error(`No such customer: ${id}`);
-      err.status = 404;
-      throw err;
-    }
-
-    return new Customer(customer);
+    // now do stuff with the array!
   }
 
   /** get all reservations for this customer. */
@@ -131,6 +117,7 @@ class Customer {
       );
     }
   }
+
 
   /** Returns a customer's first and last names joined by a space */
   get fullName() {
