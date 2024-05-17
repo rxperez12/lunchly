@@ -15,8 +15,18 @@ router.get("/", async function (req, res, next) {
   return res.render("customer_list.jinja", { customers });
 });
 
+
+/** Handle search for customers. */
+
 router.get('/name', async function (req, res, next) {
   const customerName = req.params.search;
+
+  if (!req.params.search) {
+    throw new BadRequestError("Please enter a query in the search bar.");
+  }
+
+  // call the formatName function
+
   //search for  name in db
   //return customer page or 404
 });
