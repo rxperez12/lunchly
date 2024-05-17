@@ -62,21 +62,33 @@ class Customer {
    */
   static async getByName(name) {
     const formattedName = formatName(name);
-    if (nameAsArr.length === 0) throw new Error();
+    let results;
+    if (formattedName.length === 1) {
+      results = await db.query(
+        `SELECT id,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  notes
+          FROM customers
+          WHERE first_name= $1 OR last_name = $1
+          ORDER BY first_name, last_name`,
+        [formattedName[0]]);
+    }
 
-    const results = await db.query(`
-    SELECT id,
-            first_name AS 'firstName',
-            last_name AS 'lastName',
-            phone,
-            notes
-    FROM customers
-    WHERE first_name IN ($1, $2) OR last_name IN ($1, 2)
-    ORDER BY first_name, last_name`,
-      formattedName);
-    const customers = results.rows;
-
-    if (customers.length === 0) {
+    if (formattedName.length === 2) {
+      results = await db.query(
+        `SELECT id,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  notes
+          FROM customers
+          WHERE first_name IN ($1, $2) AND last_name IN ($1, $2)
+          ORDER BY first_name, last_name`,
+        [formattedName[0], formattedName[1]]);
+    }
+    if (results.length === 0) {
       const err = new Error(`No such customer(s): ${name}`);
       err.status = 404;
       throw err;

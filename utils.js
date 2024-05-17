@@ -16,6 +16,4 @@ function formatName(name) {
   });
 }
 
-console.log(formatName('ricardo perez          '));
-
 export { formatName };
