@@ -29,6 +29,14 @@ router.get('/name', async function (req, res, next) {
 
 });
 
+/** Display the ten customers who have the most reservations. */
+
+router.get('/top-ten/', async function (req, res, next) {
+  // query the db for customers
+  // return the top 10
+  // return res.render("customer_list.jinja", { customers });
+});
+
 /** Form to add a new customer. */
 
 router.get("/add/", async function (req, res, next) {
