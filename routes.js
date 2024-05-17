@@ -15,6 +15,12 @@ router.get("/", async function (req, res, next) {
   return res.render("customer_list.jinja", { customers });
 });
 
+router.get('/name', async function (req, res, next) {
+  const customerName = req.params.search;
+  //search for  name in db
+  //return customer page or 404
+});
+
 /** Form to add a new customer. */
 
 router.get("/add/", async function (req, res, next) {
@@ -43,6 +49,7 @@ router.get("/:id/", async function (req, res, next) {
 
   return res.render("customer_detail.jinja", { customer, reservations });
 });
+
 
 /** Show form to edit a customer. */
 
@@ -85,7 +92,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
     numGuests,
     notes,
   });
-  await reservation.save();
+  await reservation.save(); //TODO: add flash message after successfully added reservation
 
   return res.redirect(`/${customerId}/`);
 });

@@ -54,6 +54,49 @@ class Customer {
     return new Customer(customer);
   }
 
+  /** get a customer by name. Take in a string,
+   * if only one name, return any matching customers,
+   * for first or last name, if full name, search for entire name
+   */
+  static async get(name) {
+    const nameAsArr = sanitzeName(name);
+
+    const results = [];
+    if (nameAsArr.length === 0) throw new Error();
+
+    if (nameAsArr.length == 2) {
+      // run this query
+    } else if (nameAsArr == 1) {
+      //run this query
+    }
+
+
+    return results;
+    // split name by space
+    //trim extra white space
+    //capitalize first letter of each word
+    const results = await db.query(
+      `SELECT id,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  notes
+           FROM customers
+           WHERE id = $1`,
+      [id],
+    );
+
+    const customer = results.rows[0];
+
+    if (customer === undefined) {
+      const err = new Error(`No such customer: ${id}`);
+      err.status = 404;
+      throw err;
+    }
+
+    return new Customer(customer);
+  }
+
   /** get all reservations for this customer. */
 
   async getReservations() {
@@ -93,6 +136,7 @@ class Customer {
   get fullName() {
     return `${this.firstName} ${this.lastName}`;
   }
+
 
 }
 
