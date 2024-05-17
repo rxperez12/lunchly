@@ -4,6 +4,8 @@ import db from "../db.js";
 import Reservation from "./reservation.js";
 import { formatName } from "../utils.js";
 
+const TOP_CUSTOMER_COUNT = 10;
+
 /** Customer of the restaurant. */
 
 class Customer {
@@ -130,6 +132,37 @@ class Customer {
       ],
       );
     }
+  }
+
+  /** Get first ten customers who have the most reservations.
+   *  Return array of objects with customer instances and reservation counts.
+   *
+   * [ {customer: {...}, reservations: num}, ...]
+  */
+
+  async getTopCustomers() {
+
+    const results = await db.query(
+      `SELECT first_name AS "firstName,
+              last_name AS "lastName",
+              phone,
+              note,
+              id,
+              COUNT(*) AS "reservations"
+        FROM customers
+        JOIN reservations ON customer.id = reservation.customer_id
+        GROUP BY customer.id
+        ORDER BY COUNT(*) desc
+        LIMIT $1`,
+      [TOP_CUSTOMER_COUNT]
+    );
+
+    return results.rows.map(c => {
+      return {
+        customer: new Customer(c),
+        reservations: c.reservations
+      };
+    });
   }
 
 
