@@ -40,6 +40,7 @@ class Reservation {
   /** Adds a new reservation if reservation is new.
    *  Updates the existing record if there are changes.
    */
+  // TODO: don't set customer id (line 56)
   async save() {
     if (this.id === undefined) {
       const result = await db.query(`
