@@ -18,23 +18,16 @@ router.get("/", async function (req, res, next) {
 
 /** Handle search for customers. */
 
+// TODO: friendlier way of handling: if no search params, render all customers
 router.get('/name/', async function (req, res, next) {
   const customerName = req.query.search;
 
-  if (!req.params.search) {
+  if (!req.query.search) {
     throw new BadRequestError("Please enter a query in the search bar.");
   }
   const customers = await Customer.getByName(customerName);
   return res.render("customer_list.jinja", { customers });
 
-});
-
-/** Display the ten customers who have the most reservations. */
-
-router.get('/top-ten/', async function (req, res, next) {
-  const customers = await Customer.getTopCustomers();
-
-  return res.render("top_ten_list.jinja", { customers });
 });
 
 /** Form to add a new customer. */
@@ -54,6 +47,16 @@ router.post("/add/", async function (req, res, next) {
   await customer.save();
 
   return res.redirect(`/${customer.id}/`);
+});
+
+/** Display the ten customers who have the most reservations. */
+
+router.get('/top-ten/', async function (req, res, next) {
+
+  // getting an arr of instance objs
+  const customers = await Customer.getTopCustomers();
+
+  return res.render("top_ten_list.jinja", { customers });
 });
 
 /** Show a customer, given their ID. */
