@@ -18,7 +18,7 @@ router.get("/", async function (req, res, next) {
 
 /** Handle search for customers. */
 
-router.get('/name', async function (req, res, next) {
+router.get('/name/', async function (req, res, next) {
   const customerName = req.query.search;
 
   if (!req.params.search) {
@@ -32,9 +32,9 @@ router.get('/name', async function (req, res, next) {
 /** Display the ten customers who have the most reservations. */
 
 router.get('/top-ten/', async function (req, res, next) {
-  // query the db for customers
-  // return the top 10
-  // return res.render("customer_list.jinja", { customers });
+  const customers = await Customer.getTopCustomers();
+
+  return res.render("top_ten_list.jinja", { customers });
 });
 
 /** Form to add a new customer. */

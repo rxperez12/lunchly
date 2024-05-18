@@ -15,6 +15,7 @@ class Customer {
     this.lastName = lastName;
     this.phone = phone;
     this.notes = notes;
+    this.reservations = null;
   }
 
   /** find all customers. */
@@ -140,29 +141,30 @@ class Customer {
    * [ {customer: {...}, reservations: num}, ...]
   */
 
-  async getTopCustomers() {
+  static async getTopCustomers() {
 
     const results = await db.query(
-      `SELECT first_name AS "firstName,
+      `SELECT first_name AS "firstName",
               last_name AS "lastName",
               phone,
-              note,
-              id,
-              COUNT(*) AS "reservations"
+              customers.notes,
+              customers.id
         FROM customers
-        JOIN reservations ON customer.id = reservation.customer_id
-        GROUP BY customer.id
+        JOIN reservations ON customers.id = reservations.customer_id
+        GROUP BY customers.id
         ORDER BY COUNT(*) desc
         LIMIT $1`,
       [TOP_CUSTOMER_COUNT]
     );
 
-    return results.rows.map(c => {
-      return {
-        customer: new Customer(c),
-        reservations: c.reservations
-      };
-    });
+    const customerPromises = results.rows.map(async function (c) {
+      let customer = new Customer(c);
+      customer.reservations = await customer.getReservations();
+      return customer;
+    }
+    );
+    const customerResolved = await Promise.allSettled(customerPromises);
+
   }
 
 
