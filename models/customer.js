@@ -161,10 +161,10 @@ class Customer {
       let customer = new Customer(c);
       customer.reservations = await customer.getReservations();
       return customer;
-    }
-    );
-    const customerResolved = await Promise.allSettled(customerPromises);
+    });
 
+    const customerResolved = await Promise.allSettled(customerPromises);
+    return customerResolved.map(c => c.value);
   }
 
 
